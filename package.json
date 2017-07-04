@@ -1,0 +1,44 @@
+{
+  "name": "react-mobx-oauth",
+  "version": "1.0.0",
+  "description": "Experiment involving react, mobx, sso",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server --debug --inline --hot",
+    "build": "webpack --progress --profile --colors --display-error-details --bail",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "mobx",
+    "sso"
+  ],
+  "author": "danbaragan",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.16.2",
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "clean-webpack-plugin": "^0.1.16",
+    "css-loader": "^0.28.4",
+    "extract-text-webpack-plugin": "^2.1.2",
+    "mobx": "^3.1.16",
+    "mobx-react": "^4.2.2",
+    "moment": "^2.18.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-hot-loader": "^1.3.1",
+    "react-router": "^4.1.1",
+    "style-loader": "^0.18.2",
+    "webpack": "^2.6.1"
+  },
+  "devDependencies": {
+    "friendly-errors-webpack-plugin": "^1.6.1",
+    "webpack-dev-server": "^2.5.0"
+  }
+}
