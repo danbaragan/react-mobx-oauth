@@ -5,10 +5,10 @@ class Todo {
   created
   @observable complete
 
-  constructor(task) {
+  constructor({ task, created=Date.now(), complete=false }) {
     this.task = task
-    this.created = Date.now()
-    this.complete = false
+    this.created = created
+    this.complete = complete
   }
 
   toggleComplete() {
@@ -40,7 +40,7 @@ export class TodoStore {
 
   loadLocalStorage() {
     if (localStorage.reactMobxOauth_todos) {
-      this.todos = JSON.parse(localStorage.reactMobxOauth_todos)
+      this.todos = JSON.parse(localStorage.reactMobxOauth_todos).map( todo_obj => new Todo(todo_obj))
     } else {
       localStorage.reactMobxOauth_todos = "[]"
     }
@@ -50,7 +50,7 @@ export class TodoStore {
     localStorage.reactMobxOauth_todos = JSON.stringify(this.todos)
   }
   createTodo(task) {
-    this.todos.push(new Todo(task))
+    this.todos.push(new Todo({task}))
   }
 }
 
