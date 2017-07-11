@@ -16,7 +16,7 @@ class Todo {
   }
 
   get repr() {
-    return `todo: ${this.task} - ${this.complete ? 'completed' : 'not completed'} (${this.id})`
+    return `todo: ${this.task} - ${this.complete ? 'completed' : 'not completed'} (${this.created})`
   }
 }
 
@@ -24,7 +24,11 @@ export class TodoStore {
   @observable todos = []
 
   constructor() {
-    autorun(() => console.log(this.repr))
+    this.loadLocalStorage()
+    autorun(() => {
+      console.log(this.repr)
+      this.saveLocalStorage()
+    })
   }
 
   @computed get repr() {
@@ -34,6 +38,17 @@ export class TodoStore {
     return `${this.todos.length} total todos. Last: ${this.todos[this.todos.length - 1].repr}`
   }
 
+  loadLocalStorage() {
+    if (localStorage.reactMobxOauth_todos) {
+      this.todos = JSON.parse(localStorage.reactMobxOauth_todos)
+    } else {
+      localStorage.reactMobxOauth_todos = "[]"
+    }
+  }
+
+  saveLocalStorage() {
+    localStorage.reactMobxOauth_todos = JSON.stringify(this.todos)
+  }
   createTodo(task) {
     this.todos.push(new Todo(task))
   }
