@@ -48,7 +48,8 @@ export class Login extends React.Component {
     FB.api('/me?fields=name,email', response => {
       if (this.store.user.name !== response.name) {
         // TODO use something that masks the user input
-        // const key = prompt("Enter your crypt key. We will not store this key for you! If you forget this key you won't be able to access your todos !!")
+        const key = prompt("Enter your crypt key. We will not store this key for you! If you forget this key you won't be able to access your todos !!")
+        this.store.user.key = key
         this.store.user.name = response.name
       }
     });

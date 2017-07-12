@@ -1,5 +1,5 @@
 import { computed, observable, autorun, observe } from "mobx"
-import JsSHA from "jssha"
+import CryptoJS from "crypto-js"
 
 
 class Todo {
@@ -27,6 +27,7 @@ export class TodoStore {
   @observable todos = []
   @observable user = {
     name: "",
+    // TODO how safe is this stored here?
     key: "",
   }
   loaded = false
@@ -51,16 +52,20 @@ export class TodoStore {
     if (!this.user.name) {
       return ""
     }
-    const sha = new JsSHA("SHA-1", "TEXT")
-    sha.update(this.user.name)
-    return `reactMobxOauth_${sha.getHash("HEX").slice(0,8)}`
+    const sha = CryptoJS.SHA1(this.user.name)
+    return `reactMobxOauth_${sha.toString(CryptoJS.enc.Hex).slice(0,8)}`
   }
 
   loadLocalStorage() {
     if (!this.userStoreId) {
       return
     }
-    const serializedTodos = localStorage.getItem(this.userStoreId) || "[]"
+    const encryptedSerializedTodos = localStorage.getItem(this.userStoreId)
+    let serializedTodos = "[]"
+    if (encryptedSerializedTodos) {
+      const decryptedSerializedTodos = CryptoJS.AES.decrypt(encryptedSerializedTodos, this.user.key)
+      serializedTodos = decryptedSerializedTodos.toString(CryptoJS.enc.Utf8)
+    }
     this.todos = JSON.parse(serializedTodos).map( todo_obj => new Todo(todo_obj))
     this.loaded = true
   }
@@ -69,7 +74,9 @@ export class TodoStore {
     if (!this.userStoreId || !this.loaded) {
       return
     }
-    localStorage.setItem(this.userStoreId, JSON.stringify(this.todos))
+    const serializedTodos = JSON.stringify(this.todos)
+    const encryptedSerializedTods = CryptoJS.AES.encrypt(serializedTodos, this.user.key)
+    localStorage.setItem(this.userStoreId, encryptedSerializedTods)
   }
   createTodo(task) {
     this.todos.push(new Todo({task}))
