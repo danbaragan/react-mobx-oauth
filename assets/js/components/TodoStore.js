@@ -5,6 +5,7 @@ class Todo {
   created
   @observable complete
 
+  // default arguments are evaluated late, at function execution and only if no value is provided by caller
   constructor({ task, created=Date.now(), complete=false }) {
     this.task = task
     this.created = created
@@ -22,6 +23,8 @@ class Todo {
 
 export class TodoStore {
   @observable todos = []
+  @observable user = ""
+  @observable key = ""
 
   constructor() {
     this.loadLocalStorage()

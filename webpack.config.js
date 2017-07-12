@@ -8,7 +8,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var rootAssetPath = path.resolve("assets");
 var outputPath = path.resolve(rootAssetPath, "bundles");
-var publicHost = 'http://localhost:2992';
+var publicHost = 'http://localhost:8080';
 var publicPath = publicHost + '/assets/bundles/';
 
 
@@ -67,6 +67,6 @@ module.exports = {
     contentBase: rootAssetPath,
     // quiet: true, // required for FriendlyErrorsWebpackPlugin
     host: '0.0.0.0',
-    port: '2992',
+    port: '8080',
   }
 };

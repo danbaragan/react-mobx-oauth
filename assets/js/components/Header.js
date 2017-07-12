@@ -8,7 +8,7 @@ export default class Header extends React.Component {
         <ul>
           <h1>secure todos</h1>
           <li><Link to="/">Todos</Link></li>
-          <li><Link to="/login">Login</Link></li>
+          <li><Link to="/login">Login/Logout</Link></li>
         </ul>
       </nav>
     )
