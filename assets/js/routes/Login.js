@@ -18,13 +18,11 @@ export class Login extends React.Component {
   constructor(props) {
     super(props)
     this.store = this.props.store
-    // FB.getLoginStatus(this.statusChangeCallback.bind(this));
     this.checkLoginStatus()
 
   }
 
   fbLogin() {
-    console.log(" +++++ fb_login")
     FB.login(this.checkLoginStatus.bind(this), {
       scope: "public_profile,email",
       return_scopes: true,
@@ -33,9 +31,9 @@ export class Login extends React.Component {
 
   fbLogout() {
     FB.logout( response => {
-      // TODO what-if response...
-      this.store.user = ""
-      this.store.key = ""
+      // TODO very optimistic about the response above...
+      this.store.user.name = ""
+      this.store.user.key = ""
     })
   }
 
@@ -44,32 +42,32 @@ export class Login extends React.Component {
   }
 
   updateCredentials() {
-    console.log('Welcome!  Fetching your information.... ');
     // this seems fine - only the api_key (app id) goes away visible.
     // app secret, access_token, etc seems safe. ish.
     // NOTE we can't POST this path, so some info goes into HTTP request URL
     FB.api('/me?fields=name,email', response => {
-      console.log(response)
-      console.log('Successful login for: ' + response.name);
-      this.store.user = response.name
+      if (this.store.user.name !== response.name) {
+        // TODO use something that masks the user input
+        // const key = prompt("Enter your crypt key. We will not store this key for you! If you forget this key you won't be able to access your todos !!")
+        this.store.user.name = response.name
+      }
     });
   };
 
   statusChangeCallback(response) {
-    console.log('statusChangeCallback');
-    console.log(response);
     if (response.status === 'connected') {
       this.updateCredentials()
     } else {
-      this.store.user = ""
+      this.store.user.name = ""
+      this.store.user.key = ""
     }
   }
 
   render() {
     return (
       <div>
-        { this.store.user ? <h2>Welcome {this.store.user}</h2> : <h2>Login</h2> }
-        { !this.store.user ? <button onClick={this.fbLogin.bind(this)}>FB Login</button> : <button onClick={this.fbLogout.bind(this)}>Logout</button> }
+        { this.store.user.name ? <h2>Welcome {this.store.user.name}</h2> : <h2>Login</h2> }
+        { !this.store.user.name ? <button onClick={this.fbLogin.bind(this)}>FB Login</button> : <button onClick={this.fbLogout.bind(this)}>Logout</button> }
 
       </div>
     )

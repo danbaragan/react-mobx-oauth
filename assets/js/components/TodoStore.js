@@ -1,4 +1,6 @@
-import { computed, observable, autorun } from "mobx"
+import { computed, observable, autorun, observe } from "mobx"
+import JsSHA from "jssha"
+
 
 class Todo {
   task
@@ -23,13 +25,16 @@ class Todo {
 
 export class TodoStore {
   @observable todos = []
-  @observable user = ""
-  @observable key = ""
+  @observable user = {
+    name: "",
+    key: "",
+  }
+  loaded = false
 
   constructor() {
-    this.loadLocalStorage()
+    observe(this.user, change => this.loadLocalStorage())
     autorun(() => {
-      console.log(this.repr)
+      // console.log(this.repr)
       this.saveLocalStorage()
     })
   }
@@ -41,16 +46,30 @@ export class TodoStore {
     return `${this.todos.length} total todos. Last: ${this.todos[this.todos.length - 1].repr}`
   }
 
-  loadLocalStorage() {
-    if (localStorage.reactMobxOauth_todos) {
-      this.todos = JSON.parse(localStorage.reactMobxOauth_todos).map( todo_obj => new Todo(todo_obj))
-    } else {
-      localStorage.reactMobxOauth_todos = "[]"
+  // depends on observable user.name. Only called if name changes
+  @computed get userStoreId() {
+    if (!this.user.name) {
+      return ""
     }
+    const sha = new JsSHA("SHA-1", "TEXT")
+    sha.update(this.user.name)
+    return `reactMobxOauth_${sha.getHash("HEX").slice(0,8)}`
+  }
+
+  loadLocalStorage() {
+    if (!this.userStoreId) {
+      return
+    }
+    const serializedTodos = localStorage.getItem(this.userStoreId) || "[]"
+    this.todos = JSON.parse(serializedTodos).map( todo_obj => new Todo(todo_obj))
+    this.loaded = true
   }
 
   saveLocalStorage() {
-    localStorage.reactMobxOauth_todos = JSON.stringify(this.todos)
+    if (!this.userStoreId || !this.loaded) {
+      return
+    }
+    localStorage.setItem(this.userStoreId, JSON.stringify(this.todos))
   }
   createTodo(task) {
     this.todos.push(new Todo({task}))

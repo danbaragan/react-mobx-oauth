@@ -12,15 +12,20 @@ export default class TodoList extends React.Component {
 
   render() {
     const store = this.props.store
-    return (
+    const todos = (
       <div>
-        <h2>Todos</h2>
-        <input onKeyPress={this.createNew.bind(this)}/>
+       <input onKeyPress={this.createNew.bind(this)}/>
         <ul>
           { store.todos.map(
             (todo, idx) => <TodoView todo={todo} key={idx}/>
           ) }
         </ul>
+      </div>
+    )
+    return (
+      <div>
+        <h2>Todos</h2>
+        { store.userStoreId ? todos : <div>Please Login first</div>}
       </div>
     )
   }

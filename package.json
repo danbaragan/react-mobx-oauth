@@ -27,6 +27,7 @@
     "clean-webpack-plugin": "^0.1.16",
     "css-loader": "^0.28.4",
     "extract-text-webpack-plugin": "^2.1.2",
+    "jssha": "^2.3.1",
     "mobx": "^3.1.16",
     "mobx-react": "^4.2.2",
     "moment": "^2.18.1",
