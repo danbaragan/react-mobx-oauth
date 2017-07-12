@@ -1,6 +1,7 @@
 import { computed, observable, autorun, observe } from "mobx"
 import CryptoJS from "crypto-js"
 
+window.cry = CryptoJS
 
 class Todo {
   task
@@ -28,14 +29,18 @@ export class TodoStore {
   @observable user = {
     name: "",
     // TODO how safe is this stored here?
+    // TODO make a setter here. We need to test the key for validity
     key: "",
   }
+  // TODO use this better. The app should be locked when store not loaded
+  // currently it is a mess
   loaded = false
 
   constructor() {
     observe(this.user, change => this.loadLocalStorage())
     autorun(() => {
-      // console.log(this.repr)
+      // TODO Put a propper redux in place. This is a hack based on repr touching all the fields we are interested in
+      console.log(this.repr)
       this.saveLocalStorage()
     })
   }
@@ -56,18 +61,49 @@ export class TodoStore {
     return `reactMobxOauth_${sha.toString(CryptoJS.enc.Hex).slice(0,8)}`
   }
 
+  _decryptLocalStorage(encryptedSerializedTodos) {
+    try {
+      const decryptedSerializedTodos = CryptoJS.AES.decrypt(encryptedSerializedTodos, this.user.key)
+      const serializedTodos = decryptedSerializedTodos.toString(CryptoJS.enc.Utf8)
+      return serializedTodos
+    } catch (e) {
+      return ""
+    }
+
+  }
+
+  // TODO valid OR logged user... these cries for a refactor
+  validKey() {
+    if (!this.userStoreId) {
+      return false
+    }
+    const encryptedSerializedTodos = localStorage.getItem(this.userStoreId)
+    const dec = this._decryptLocalStorage(encryptedSerializedTodos)
+
+    return !!dec
+  }
+
   loadLocalStorage() {
     if (!this.userStoreId) {
       return
     }
     const encryptedSerializedTodos = localStorage.getItem(this.userStoreId)
-    let serializedTodos = "[]"
-    if (encryptedSerializedTodos) {
-      const decryptedSerializedTodos = CryptoJS.AES.decrypt(encryptedSerializedTodos, this.user.key)
-      serializedTodos = decryptedSerializedTodos.toString(CryptoJS.enc.Utf8)
+
+    // fresh start
+    if (!encryptedSerializedTodos) {
+      this.loaded = true
+      console.log("New user. Take pass as granted")
+      return
     }
-    this.todos = JSON.parse(serializedTodos).map( todo_obj => new Todo(todo_obj))
-    this.loaded = true
+
+    const serializedTodos = this._decryptLocalStorage(encryptedSerializedTodos)
+    if (serializedTodos) {
+      this.todos = JSON.parse(serializedTodos).map( todo_obj => new Todo(todo_obj))
+      this.loaded = true
+    } else {
+      this.todos = []
+      console.log("Bad passkey!")
+    }
   }
 
   saveLocalStorage() {
@@ -78,6 +114,7 @@ export class TodoStore {
     const encryptedSerializedTods = CryptoJS.AES.encrypt(serializedTodos, this.user.key)
     localStorage.setItem(this.userStoreId, encryptedSerializedTods)
   }
+
   createTodo(task) {
     this.todos.push(new Todo({task}))
   }

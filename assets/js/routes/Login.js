@@ -34,6 +34,7 @@ export class Login extends React.Component {
       // TODO very optimistic about the response above...
       this.store.user.name = ""
       this.store.user.key = ""
+      this.store.loaded = false
     })
   }
 
@@ -51,6 +52,10 @@ export class Login extends React.Component {
         const key = prompt("Enter your crypt key. We will not store this key for you! If you forget this key you won't be able to access your todos !!")
         this.store.user.key = key
         this.store.user.name = response.name
+        if (!this.store.validKey()) {
+          this.fbLogout()
+          alert("Bad key!") // TODO or a problem with name - fix this
+        }
       }
     });
   };
