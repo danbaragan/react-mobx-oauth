@@ -78,6 +78,10 @@ export class TodoStore {
       return false
     }
     const encryptedSerializedTodos = localStorage.getItem(this.userStoreId)
+    if (!encryptedSerializedTodos) {
+      // new user
+      return true
+    }
     const dec = this._decryptLocalStorage(encryptedSerializedTodos)
 
     return !!dec
